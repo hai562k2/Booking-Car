@@ -1,4 +1,4 @@
-import { BookingDetail } from 'src/bookingdetails/bookingdetails.entity';
+import { BookingDetail } from '../bookingdetails/bookingdetails.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()
@@ -10,13 +10,16 @@ export class Vehicle {
   type: string;
 
   @Column()
+  image: string;
+
+  @Column()
   license_plate: string;
 
   @Column()
   seats: number;
 
-  @Column()
-  status_vehicle: string;
+  @Column({ default: true })
+  status_vehicle: boolean;
 
   @OneToMany(() => BookingDetail, (bookingdetail) => bookingdetail.vehicle)
   bookingdetails: BookingDetail[];

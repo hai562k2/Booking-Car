@@ -3,10 +3,12 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DeepPartial } from 'typeorm';
-import { EntityCondition } from 'src/utils/types/entity-condition';
-import { NullableType } from 'src/utils/types/nullables.type';
+import { EntityCondition } from '../utils/types/entity-condition';
+import { NullableType } from '../utils/types/nullables.type';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { Department } from 'src/departments/department.entity';
+import { Department } from '../departments/department.entity';
+import { IPaginationOptions } from '../utils/types/pagination-options';
+import { Vehicle } from '../vehicles/vehicle.entity';
 
 @Injectable()
 export class UsersService {
@@ -17,10 +19,12 @@ export class UsersService {
   async create(
     createProfileDto: CreateUserDto,
     department: Department,
+    vehicle?: Vehicle,
   ): Promise<User> {
-    const { departmentId, ...userData } = createProfileDto;
+    const { departmentId, vehicleId, ...userData } = createProfileDto;
     const user = this.userRepository.create(userData);
     user.department = department;
+    user.vehicle = vehicle;
     return this.userRepository.save(user);
   }
 
@@ -32,11 +36,22 @@ export class UsersService {
 
   find(id: number, attrs: DeepPartial<User>) {}
 
-  update(updateProfileDto: UpdateUserDto, attrs: DeepPartial<User>) {
-    const user = this.userRepository.findOne;
-    if(!user) {
+  findManyWithPagination(
+    paginationOptions: IPaginationOptions,
+  ): Promise<User[]> {
+    return this.userRepository.find({
+      skip: (paginationOptions.page - 1) * paginationOptions.limit,
+      take: paginationOptions.limit,
+    });
+  }
+
+  async update(id: number, payLoad: Partial<User>) {
+    const user = await this.userRepository.findOne({ where: { id: id } });
+    if (!user) {
       throw new NotFoundException('User not found!');
     }
+    Object.assign(user, payLoad);
+    return await this.userRepository.save(user);
   }
 
   remove() {}

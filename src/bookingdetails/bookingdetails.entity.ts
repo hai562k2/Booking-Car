@@ -1,5 +1,14 @@
-import { Vehicle } from 'src/vehicles/vehicle.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { User } from '../users/user.entity';
+import { Vehicle } from '../vehicles/vehicle.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+import { StatusBookings } from './status-booking.enum';
 
 @Entity()
 export class BookingDetail {
@@ -7,34 +16,47 @@ export class BookingDetail {
   id: number;
 
   @Column()
-  time_start: Date;
+  request: string;
 
   @Column()
-  time_end: Date;
+  departmentName: string;
 
   @Column()
-  location_start: string;
+  timeStart: Date;
 
   @Column()
-  location_end: string;
+  timeEnd: Date;
 
   @Column()
-  number_passenger: number;
+  locationStart: string;
 
   @Column()
-  position_title: string;
+  locationEnd: string;
 
   @Column()
-  status_booking: string;
+  numberPassenger: number;
+
+  @Column()
+  positionTitle: string;
+
+  @Column({ default: StatusBookings.PENDING_ACCESS })
+  statusBooking: StatusBookings;
 
   @Column()
   area: string;
 
   @Column()
-  reason_booking: string;
+  reasonBooking: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
+
+  @UpdateDateColumn()
+  updatedAt: Date;
 
   @ManyToOne(() => Vehicle, (vehicle) => vehicle.bookingdetails)
   vehicle: Vehicle;
 
-  
+  @ManyToOne(() => User, (user) => user.bookingdetails)
+  user: User;
 }

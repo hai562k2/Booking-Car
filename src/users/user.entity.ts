@@ -1,6 +1,9 @@
-import { Department } from 'src/departments/department.entity';
-import { Reason } from 'src/reasons/reason.entity';
-import { Vehicle } from 'src/vehicles/vehicle.entity';
+import { BookingDetail } from '../bookingdetails/bookingdetails.entity';
+import { Department } from '../departments/department.entity';
+import { Reason } from '../reasons/reason.entity';
+import { Role } from '../roles/roles.enum';
+
+import { Vehicle } from '../vehicles/vehicle.entity';
 import {
   Entity,
   Column,
@@ -9,6 +12,7 @@ import {
   ManyToOne,
   OneToOne,
   JoinColumn,
+  Unique,
 } from 'typeorm';
 
 @Entity()
@@ -20,7 +24,7 @@ export class User {
   username: string;
 
   @Column()
-  password: number;
+  password: string;
 
   @Column()
   fullname: string;
@@ -28,18 +32,24 @@ export class User {
   @Column()
   avatar: string;
 
-  @Column()
+  @Column({ type: 'enum', enum: Role, default: Role.DRIVER })
   role: string;
+
+  @Column({ default: null })
+  hashedRt: string;
 
   @ManyToOne(() => Department, (department) => department.users, {
     onDelete: 'CASCADE',
   })
-  department: Department;
+  department?: Department;
 
   @OneToOne(() => Vehicle)
   @JoinColumn()
-  vehicle: Vehicle;
+  vehicle?: Vehicle;
 
   @OneToMany(() => Reason, (reason) => reason.user)
-  reasons: Reason[];
+  reasons?: Reason[];
+
+  @OneToMany(() => BookingDetail, (bookingdetail) => bookingdetail.user)
+  bookingdetails?: BookingDetail[];
 }

@@ -1,25 +1,31 @@
 import { Module } from '@nestjs/common';
-import { LocalStrategy } from './strategies/local.strategy';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../users/user.entity';
-import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtModule, JwtService } from '@nestjs/jwt';
+import { AuthController } from './auth.controller';
+
+import { UsersModule } from '../users/users.module';
+import { DepartmentsModule } from '../departments/departments.module';
+import { JwtAccessTokenStrategy, JwtRefreshStrategy } from './strategies';
+import { JwtModule } from '@nestjs/jwt';
+import { AuthGuard } from '@nestjs/passport';
+import { RolesGuard } from '../common/guards/roles.guard';
+import { Vehicle } from '../vehicles/vehicle.entity';
+import { VehiclesModule } from '../vehicles/vehicles.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
-    JwtModule.registerAsync({
-      useFactory: () => ({
-        secret: process.env.AUTH_SECRET,
-        signOptions: {
-          expiresIn: '60m',
-        },
-      }),
-    }),
+    AuthModule,
+    UsersModule,
+    DepartmentsModule,
+    VehiclesModule,
+    JwtModule.register({}),
   ],
-
-  providers: [LocalStrategy, AuthService],
+  providers: [
+    AuthService,
+    JwtAccessTokenStrategy,
+    JwtRefreshStrategy,
+    RolesGuard,
+  ],
   controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {}

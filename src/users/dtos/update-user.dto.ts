@@ -12,7 +12,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {
   @IsInt()
   @IsOptional()
   @Matches(/^.{6,}$/, { message: 'Password must be 6 characters of number' })
-  password: number;
+  password: string;
 
   @IsString()
   @Matches(/^.{3,} .*$/, {
